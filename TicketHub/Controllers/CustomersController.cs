@@ -24,9 +24,18 @@ namespace TicketHubapi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(Customers customers)
+        public IActionResult Post(Customer customer)
         {
-            return Ok("Hello from contact controller);
+            // Validation
+            if (string.IsNullOrEmpty(customer.FirstName))
+            {
+                return BadRequest(" First name is invalid.");
+            }
+            if (string.IsNullOrEmpty(customer.LastName))
+            {
+                return BadRequest(" Last name is invalid.");
+            }
+            return Ok("Hello " + customer.FirstName + " from contact controller");
         }
     }
 }
