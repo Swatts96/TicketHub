@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TicketHub.Controllers;
+using TicketHubapi.Controllers;
+using TicketHubAPI.Models;
 
 namespace TicketHubapi.Controllers
 {
