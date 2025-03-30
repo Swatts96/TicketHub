@@ -56,13 +56,6 @@ namespace TicketHubAPI.Controllers
                 return StatusCode(500, new { message = "Error processing purchase request." });
             }
         }
-
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok("CustomersController is running. Ready to accept POST requests.");
-        }
     }
 
 }
