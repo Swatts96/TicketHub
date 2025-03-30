@@ -34,6 +34,9 @@ namespace TicketHubAPI.Controllers
                 // Name of the queue
                 var queueName = "tickethub";
 
+                // Logging connections string
+                _logger.LogInformation("AzureStorage Connection String: {ConnectionString}", connectionString);
+
                 // Create the queue client and ensure the queue exists
                 var queueClient = new QueueClient(connectionString, queueName);
                 await queueClient.CreateIfNotExistsAsync();
@@ -53,5 +56,13 @@ namespace TicketHubAPI.Controllers
                 return StatusCode(500, new { message = "Error processing purchase request." });
             }
         }
+
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("CustomersController is running. Ready to accept POST requests.");
+        }
     }
+
 }
