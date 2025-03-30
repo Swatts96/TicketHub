@@ -18,6 +18,13 @@ namespace TicketHubAPI.Controllers
             _configuration = configuration;
         }
 
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("CustomersController is running. Ready to accept POST requests.");
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Customer customer)
         {
