@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Storage.Queues;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using TicketHubAPI.Models;
 
 namespace TicketHubAPI.Controllers
@@ -10,34 +12,46 @@ namespace TicketHubAPI.Controllers
         private readonly ILogger<CustomersController> _logger;
         private readonly IConfiguration _configuration;
 
-        // Constructor injection for both logger and configuration
         public CustomersController(ILogger<CustomersController> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok("Hello from CustomersController - GET");
-        }
-
         [HttpPost]
-        public IActionResult Post(Customer customer)
+        public async Task<IActionResult> Post([FromBody] Customer customer)
         {
-            // Basic validation (note: model binding + [Required] annotations do most of this)
-            if (string.IsNullOrEmpty(customer.FirstName))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("First name is invalid.");
+                return BadRequest(ModelState);
             }
 
-            if (string.IsNullOrEmpty(customer.LastName))
+            try
             {
-                return BadRequest("Last name is invalid.");
-            }
+                // Retrieve the Azure Storage connection string from configuration
+                var connectionString = _configuration.GetConnectionString("AzureStorage");
 
-            return Ok("Hello " + customer.FirstName + " from CustomersController");
+                // Name of the queue
+                var queueName = "tickethub";
+
+                // Create the queue client and ensure the queue exists
+                var queueClient = new QueueClient(connectionString, queueName);
+                await queueClient.CreateIfNotExistsAsync();
+
+                // Serialize the payload to JSON and encode it in Base64
+                var jsonPayload = JsonSerializer.Serialize(customer);
+                var base64Message = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(jsonPayload));
+
+                // Send the message to the queue
+                await queueClient.SendMessageAsync(base64Message);
+
+                return Ok(new { message = "Purchase received and added to queue." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding message to queue.");
+                return StatusCode(500, new { message = "Error processing purchase request." });
+            }
         }
     }
 }
