@@ -23,10 +23,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore TicketHub/TicketHubapi.csproj
 
-      - name: Build with dotnet
+      - name: Build project
         run: dotnet build TicketHub/TicketHubapi.csproj --configuration Release
 
-      - name: Publish with dotnet
+      - name: Publish project
         run: dotnet publish TicketHub/TicketHubapi.csproj --configuration Release --output ./out
 
       - name: Upload artifact for deployment job
@@ -64,4 +64,4 @@ jobs:
         with:
           app-name: 'nscc-0292233-tickethub'
           slot-name: 'Production'
-          package: .
+          package: ./out
